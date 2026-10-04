@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>极光录屏 · 简洁好用的 Windows 桌面录屏工具</title>
+<meta name="description" content="极光录屏是一款免费、无水印、不限时长的 Windows 桌面录屏工具，支持全屏/区域/窗口录制、系统声音与麦克风、硬件编码高清流畅、画面特效、提词器、AI 字幕与自动更新。" />
+<link rel="icon" href="assets/logo.png" />
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" />
+<style>
+  :root{
+    --bg:#0a0e14;
+    --bg-soft:#0f151e;
+    --card:#131b26;
+    --card-2:#17202d;
+    --line:rgba(255,255,255,.08);
+    --line-soft:rgba(255,255,255,.05);
+    --text:#e9eff7;
+    --text-2:#9fabbd;
+    --text-3:#6b7889;
+    --c1:#2dd4bf;
+    --c2:#38bdf8;
+    --c3:#818cf8;
+    --red:#f43f5e;
+    --grad:linear-gradient(100deg,var(--c1),var(--c2) 48%,var(--c3));
+    --radius:16px;
+    --shadow:0 24px 60px -24px rgba(0,0,0,.7);
+    --maxw:1120px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Noto Sans SC",-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);
+    line-height:1.7;-webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(720px 420px at 78% -8%,rgba(56,189,248,.14),transparent 60%),
+      radial-gradient(680px 420px at 12% 4%,rgba(129,140,248,.13),transparent 60%),
+      radial-gradient(720px 460px at 50% 108%,rgba(45,212,191,.10),transparent 60%);
+  }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* 按钮 */
+  .btn{display:inline-flex;align-items:center;gap:9px;font-weight:500;font-size:15px;
+    border-radius:11px;padding:12px 22px;cursor:pointer;border:1px solid transparent;
+    transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease;white-space:nowrap}
+  .btn-primary{background:var(--grad);color:#06121a;font-weight:700;
+    box-shadow:0 14px 34px -12px rgba(56,189,248,.55)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 20px 42px -14px rgba(56,189,248,.7)}
+  .btn-ghost{background:rgba(255,255,255,.04);border-color:var(--line);color:var(--text)}
+  .btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}
+  .btn svg{width:18px;height:18px}
+
+  /* 导航 */
+  header.nav{position:sticky;top:0;z-index:50;
+    background:rgba(10,14,20,.72);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line-soft)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:18px}
+  .brand img{width:32px;height:32px;border-radius:9px}
+  .nav-links{display:flex;align-items:center;gap:26px}
+  .nav-links a.link{color:var(--text-2);font-size:14.5px;transition:color .15s}
+  .nav-links a.link:hover{color:var(--text)}
+  .nav-cta{display:flex;align-items:center;gap:12px}
+  .nav-cta .btn{padding:9px 17px;font-size:14px}
+  .gh-icon{display:flex;color:var(--text-2);transition:color .15s}
+  .gh-icon:hover{color:var(--text)}
+  .gh-icon svg{width:23px;height:23px}
+
+  /* Hero */
+  .hero{padding:78px 0 64px;position:relative}
+  .hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:54px;align-items:center}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--c1);
+    background:rgba(45,212,191,.09);border:1px solid rgba(45,212,191,.22);
+    padding:6px 14px;border-radius:999px;margin-bottom:22px;font-weight:500}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--c1);
+    box-shadow:0 0 0 4px rgba(45,212,191,.18)}
+  h1{font-size:clamp(34px,4.6vw,52px);line-height:1.18;font-weight:900;letter-spacing:-.5px}
+  .hero p.lead{font-size:17px;color:var(--text-2);margin:20px 0 30px;max-width:520px}
+  .hero-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .hero-meta{margin-top:20px;font-size:13px;color:var(--text-3);display:flex;gap:18px;flex-wrap:wrap}
+  .hero-meta span{display:inline-flex;align-items:center;gap:6px}
+  .hero-meta svg{width:15px;height:15px;color:var(--c2)}
+
+  .hero-shot{position:relative}
+  .hero-shot .frame{border-radius:14px;overflow:hidden;border:1px solid var(--line);
+    background:var(--card);box-shadow:var(--shadow)}
+  .hero-shot .frame img{width:100%}
+  .hero-shot::after{content:"";position:absolute;inset:-26px -20px -34px;z-index:-1;
+    background:var(--grad);filter:blur(64px);opacity:.22;border-radius:40px}
+  .float-badge{position:absolute;left:-18px;bottom:34px;background:var(--card-2);
+    border:1px solid var(--line);border-radius:12px;padding:10px 15px;font-size:13px;
+    display:flex;align-items:center;gap:9px;box-shadow:var(--shadow)}
+  .float-badge b{color:var(--c1);font-size:15px}
+
+  /* 区块通用 */
+  section.block{padding:70px 0}
+  .sec-head{text-align:center;max-width:680px;margin:0 auto 50px}
+  .sec-head .kicker{font-size:13px;font-weight:700;letter-spacing:2px;color:var(--c2);text-transform:uppercase}
+  .sec-head h2{font-size:clamp(26px,3.2vw,36px);font-weight:800;margin:12px 0 14px;letter-spacing:-.3px}
+  .sec-head p{color:var(--text-2);font-size:16px}
+
+  /* 特性 */
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .feat{background:linear-gradient(180deg,var(--card),var(--bg-soft));
+    border:1px solid var(--line);border-radius:var(--radius);padding:26px 24px;
+    transition:transform .2s ease,border-color .2s ease}
+  .feat:hover{transform:translateY(-4px);border-color:rgba(56,189,248,.32)}
+  .feat .ic{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);margin-bottom:16px}
+  .feat .ic svg{width:23px;height:23px;color:var(--c2)}
+  .feat h3{font-size:16.5px;font-weight:700;margin-bottom:7px}
+  .feat p{font-size:14px;color:var(--text-2);line-height:1.65}
+
+  /* 截图 */
+  .shots{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .shot-card{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    background:var(--card);transition:transform .2s ease,border-color .2s ease}
+  .shot-card:hover{transform:translateY(-5px);border-color:rgba(129,140,248,.34)}
+  .shot-card .img{aspect-ratio:43/46;overflow:hidden;background:#0c1118}
+  .shot-card .img img{width:100%;height:100%;object-fit:cover;object-position:top}
+  .shot-card .cap{padding:15px 18px}
+  .shot-card .cap h4{font-size:14.5px;font-weight:600}
+  .shot-card .cap p{font-size:12.5px;color:var(--text-3);margin-top:3px}
+
+  /* 更新亮点 */
+  .update-wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:44px;align-items:center;
+    background:linear-gradient(180deg,var(--card),var(--bg-soft));
+    border:1px solid var(--line);border-radius:22px;padding:42px}
+  .update-wrap h2{font-size:27px;font-weight:800;margin-bottom:14px}
+  .update-wrap p{color:var(--text-2);font-size:15px;margin-bottom:22px}
+  .note-list{list-style:none;display:flex;flex-direction:column;gap:13px}
+  .note-list li{display:flex;gap:12px;font-size:14.5px;color:var(--text-2);align-items:flex-start}
+  .note-list .tick{flex:0 0 auto;width:21px;height:21px;border-radius:50%;margin-top:2px;
+    background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.3);
+    display:flex;align-items:center;justify-content:center}
+  .note-list .tick svg{width:12px;height:12px;color:var(--c1)}
+  .update-shot{border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+
+  /* CTA */
+  .cta{text-align:center;padding:84px 0}
+  .cta-box{position:relative;border-radius:24px;border:1px solid var(--line);
+    background:linear-gradient(180deg,var(--card-2),var(--bg-soft));padding:60px 32px;overflow:hidden}
+  .cta-box::before{content:"";position:absolute;inset:-40%;z-index:0;
+    background:radial-gradient(circle at 50% 0,rgba(56,189,248,.18),transparent 55%)}
+  .cta-box>*{position:relative;z-index:1}
+  .cta h2{font-size:clamp(26px,3.4vw,38px);font-weight:900;margin-bottom:14px}
+  .cta p{color:var(--text-2);font-size:16px;margin-bottom:30px}
+  .cta .btn{padding:15px 34px;font-size:16px}
+  .cta .small{margin-top:18px;font-size:13px;color:var(--text-3)}
+
+  /* Footer */
+  footer{border-top:1px solid var(--line-soft);padding:42px 0 34px;background:var(--bg-soft)}
+  .foot-grid{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;align-items:flex-start}
+  .foot-brand{max-width:320px}
+  .foot-brand .brand{margin-bottom:12px}
+  .foot-brand p{font-size:13px;color:var(--text-3)}
+  .foot-cols{display:flex;gap:56px}
+  .foot-col h5{font-size:13.5px;font-weight:600;margin-bottom:13px}
+  .foot-col a{display:block;font-size:13.5px;color:var(--text-3);margin-bottom:9px;transition:color .15s}
+  .foot-col a:hover{color:var(--text)}
+  .foot-bottom{margin-top:34px;padding-top:22px;border-top:1px solid var(--line-soft);
+    display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    font-size:12.5px;color:var(--text-3)}
+
+  /* 滚动揭示 */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none;transition:none}
+    html{scroll-behavior:auto}
+  }
+
+  /* 响应式 */
+  @media (max-width:920px){
+    .hero-grid{grid-template-columns:1fr;gap:44px}
+    .hero-shot{max-width:480px;margin:0 auto}
+    .feat-grid{grid-template-columns:repeat(2,1fr)}
+    .shots{grid-template-columns:1fr;max-width:440px;margin:0 auto}
+    .update-wrap{grid-template-columns:1fr;padding:30px}
+    .nav-links a.link{display:none}
+  }
+  @media (max-width:580px){
+    .feat-grid{grid-template-columns:1fr}
+    .foot-cols{gap:34px}
+    .hero{padding:54px 0 44px}
+    section.block{padding:52px 0}
+    .float-badge{left:6px}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top"><img src="assets/logo.png" alt="极光录屏 logo" />极光录屏</a>
+    <nav class="nav-links">
+      <a class="link" href="#features">功能特性</a>
+      <a class="link" href="#screenshots">界面预览</a>
+      <a class="link" href="#update">自动更新</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="gh-icon" href="https://github.com/haoeastspeed/AuroraRecorder" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.5v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.6.8.5 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+      </a>
+      <a class="btn btn-primary" href="https://github.com/haoeastspeed/AuroraRecorder/releases/latest">免费下载</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="hero-text">
+      <span class="pill"><span class="dot"></span>免费 · 无水印 · 不限时长</span>
+      <h1>把屏幕里的精彩，<br /><span class="grad-text">轻松录下来</span></h1>
+      <p class="lead">极光录屏是一款简洁好用的 Windows 桌面录屏工具。全屏、区域、窗口随心录，系统声音与麦克风同时收录，硬件编码带来高清流畅、体积小巧的成片。</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="https://github.com/haoeastspeed/AuroraRecorder/releases/latest">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5" /><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" /></svg>
+          免费下载
+        </a>
+        <a class="btn btn-ghost" href="#features">了解功能</a>
+      </div>
+      <div class="hero-meta">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7z" /></svg>Windows 10 / 11</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h6l-1 8 9-12h-6z" /></svg>硬件加速编码</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16" /></svg>单文件免安装</span>
+      </div>
+    </div>
+    <div class="hero-shot">
+      <div class="frame"><img src="assets/screen-main.png" alt="极光录屏主界面" /></div>
+      <div class="float-badge"><b>69.6h</b><span style="color:var(--text-2)">磁盘可录时长</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Features</div>
+      <h2>一款软件，覆盖录屏全场景</h2>
+      <p>从录制、收音到后期处理，极光录屏把专业能力做得简单顺手，开箱即用。</p>
+    </div>
+    <div class="feat-grid">
+
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" /></svg></div>
+        <h3>多种录制范围</h3>
+        <p>全屏、自定义区域、指定窗口三种模式，框选即录；录制时主界面自动隐藏，只留不进画面的悬浮小控件。</p>
+      </div>
+
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4V5z" /><path d="M16 9a4 4 0 010 6M19 6a8 8 0 010 12" /></svg></div>
+        <h3>内外声音同步收录</h3>
+        <p>WASAPI 高清采集系统声音与麦克风，独立调节音量并实时混音；支持智能降噪，让人声更干净。</p>
+      </div>
+
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6z" /></svg></div>
+        <h3>硬件加速编码</h3>
+        <p>调用显卡硬件编码器输出 H.264 / HEVC，恒定帧率、画面流畅，CPU 占用低且成片体积更小。</p>
+      </div>
+
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V6z" /><path d="M9 12l2 2 4-4" /></svg></div>
+        <h3>分段录制 · 崩溃恢复</h3>
+        <p>按时长分段无缝写入，意外断电或崩溃也只损失最后一小段；重启后可自动恢复、合并已录制内容。</p>
+      </div>
+
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3z" /><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" /></svg></div>
+        <h3>丰富画面特效</h3>
+        <p>按键可视化、鼠标聚光灯、点击高亮、步骤编号与自定义水印，教程演示重点一目了然。</p>
+      </div>
+
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l3 3v15H6z" /><path d="M9 8h6M9 12h6M9 16h4" /></svg></div>
+        <h3>提词器</h3>
+        <p>半透明提词窗跟随语速滚动，字号、边距自由调节，且自动排除在录制画面之外，口播不再忘词。</p>
+      </div>
+
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg></div>
+        <h3>计划录制</h3>
+        <p>设定开始时间与录制时长，到点自动开始、到时自动停止，无人值守也能准时完成录制任务。</p>
+      </div>
+
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M7 14v-3M10 14v-4M13 14v-2M16 14v-3" /></svg></div>
+        <h3>AI 字幕 · 智能降噪</h3>
+        <p>本地语音识别自动生成并导出 SRT 字幕；高通、谱减与噪声门多重处理，有效抑制环境杂音。</p>
+      </div>
+
+      <div class="feat reveal">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="13" height="12" rx="2" /><path d="M15 10l7-3v10l-7-3z" /></svg></div>
+        <h3>摄像头与色度键</h3>
+        <p>摄像头画中画可设形状、位置与大小；支持绿 / 蓝幕色度键抠像，轻松合成个性化讲解画面。</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="block" id="screenshots" style="padding-top:10px">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="kicker">Preview</div>
+      <h2>简洁美观，一目了然</h2>
+      <p>没有繁杂的菜单与层层弹窗，常用功能触手可及。</p>
+    </div>
+    <div class="shots">
+      <div class="shot-card reveal">
+        <div class="img"><img src="assets/screen-main.png" alt="主界面" /></div>
+        <div class="cap"><h4>主界面</h4><p>选择范围，一键开始录制</p></div>
+      </div>
+      <div class="shot-card reveal">
+        <div class="img"><img src="assets/screen-settings.png" alt="参数设置" /></div>
+        <div class="cap"><h4>参数设置</h4><p>帧率、画质、编码专业可调</p></div>
+      </div>
+      <div class="shot-card reveal">
+        <div class="img"><img src="assets/screen-update.png" alt="自动更新" /></div>
+        <div class="cap"><h4>自动更新</h4><p>新版本一键下载，永不过时</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="update">
+  <div class="wrap">
+    <div class="update-wrap reveal">
+      <div>
+        <h2>内置自动更新，<span class="grad-text">始终保持最新</span></h2>
+        <p>软件会在启动后安静地检查新版本，发现更新时才温和提示；下载经过完整性校验，一键应用并自动重启，无需手动找安装包。</p>
+        <ul class="note-list">
+          <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7" /></svg></span>启动后台静默检查，也可在设置中手动检查</li>
+          <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7" /></svg></span>流式下载并实时显示进度，支持断点续传式重试</li>
+          <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7" /></svg></span>SHA-256 校验，确认文件完整、未被篡改</li>
+          <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7" /></svg></span>一键应用，自动覆盖并重启，全程无黑窗</li>
+        </ul>
+      </div>
+      <div class="update-shot"><img src="assets/screen-update.png" alt="自动更新窗口" /></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <div class="cta-box reveal">
+      <h2>现在就开始，<span class="grad-text">免费录制</span></h2>
+      <p>无需注册、无水印、不限时长，下载即用。</p>
+      <a class="btn btn-primary" href="https://github.com/haoeastspeed/AuroraRecorder/releases/latest">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5" /><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" /></svg>
+        下载极光录屏
+      </a>
+      <div class="small">Windows 10 及以上 · 单文件免安装 · 约 74 MB</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top"><img src="assets/logo.png" width="32" height="32" style="border-radius:9px" alt="" />极光录屏</a>
+        <p>简洁好用的 Windows 桌面录屏工具，免费、无水印、不限时长，让每一次屏幕记录都轻松自如。</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h5>产品</h5>
+          <a href="#features">功能特性</a>
+          <a href="#screenshots">界面预览</a>
+          <a href="#update">自动更新</a>
+        </div>
+        <div class="foot-col">
+          <h5>下载</h5>
+          <a href="https://github.com/haoeastspeed/AuroraRecorder/releases/latest">最新版本</a>
+          <a href="https://github.com/haoeastspeed/AuroraRecorder/releases">所有版本</a>
+        </div>
+        <div class="foot-col">
+          <h5>资源</h5>
+          <a href="https://github.com/haoeastspeed/AuroraRecorder">GitHub 仓库</a>
+          <a href="https://github.com/haoeastspeed/AuroraRecorder/issues">问题反馈</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 极光录屏 AuroraRecorder</span>
+      <span>Made for Windows · 本软件免费提供</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: .12 });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+</script>
+
+</body>
+</html>
